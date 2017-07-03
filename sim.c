@@ -64,17 +64,23 @@ void access_mem(char type, addr_t vaddr) {
 
 
 void replay_trace(FILE *infp) {
+    printf("11");
 	char buf[MAXLINE];
 	addr_t vaddr = 0;
 	char type;
 
 	while(fgets(buf, MAXLINE, infp) != NULL) {
+    printf("13");
 		if(buf[0] != '=') {
+    printf("14");
 			sscanf(buf, "%c %lx", &type, &vaddr);
+    printf("14");
 			if(debug)  {
 				printf("%c %lx\n", type, vaddr);
 			}
+    printf("15");
 			access_mem(type, vaddr);
+    printf("16");
 		} else {
 			continue;
 		}
@@ -110,7 +116,9 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	if(tracefile != NULL) {
+    printf("12\n");
 		if((tfp = fopen(tracefile, "r")) == NULL) {
+    printf("13\n");
 			perror("Error opening tracefile:");
 			exit(1);
 		}
@@ -121,8 +129,11 @@ int main(int argc, char *argv[]) {
 	// so that the init_fcn can refer to the coremap if needed.
 	coremap = malloc(memsize * sizeof(struct frame));
 	physmem = malloc(memsize * SIMPAGESIZE);
+    printf("test\n");
 	swap_init(swapsize);
+    printf("2\n");
 	init_pagetable();
+    printf("3\n");
 
 	// Initialize replacement algorithm functions.
 	if(replacement_alg == NULL) {
@@ -144,11 +155,16 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 	}
+    printf("4\n");
 	// Call replacement algorithm's init_fcn before replaying trace.
 	init_fcn();
 
+    printf("5\n");
+    printf("5\n");
 	replay_trace(tfp);
+    printf("6\n");
 	print_pagedirectory();
+    printf("7\n");
 
 	// Cleanup - removes temporary swapfile.
 	swap_destroy();
