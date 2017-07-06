@@ -125,7 +125,7 @@ bitmap_unmark(struct bitmap *b, unsigned index)
 
 
 int
-bitmap_isset(struct bitmap *b, unsigned index) 
+bitmap_isset(struct bitmap *b, unsigned index) //is non-zero if bit is a member of bitmap, zero otherwise.
 {
         unsigned ix;
         unsigned mask;
