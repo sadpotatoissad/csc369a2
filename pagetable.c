@@ -178,12 +178,12 @@ char *find_physpage(addr_t vaddr, char type) {
 		
 		//ONSWAP is 1, page is on disk
 		if ((p->frame) & PG_ONSWAP) {
+			p->frame = frame_no << PAGE_SHIFT;
 			swap_pagein(frame_no, p->swap_off);
-			//page is in memory now, mark it as VALID
-			p->frame |= PG_VALID;
 		}
 		// page is not on disk, first time access the page
-		else {			
+		else {	
+			p->frame = frame_no << PAGE_SHIFT;		
 			init_frame(frame_no, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
