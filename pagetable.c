@@ -42,7 +42,7 @@ int allocate_frame(pgtbl_entry_t *p) {
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
         //if dirty write victim page to swap
-        if ((coremap[frame].pte |= ~PG_DIRTY)){
+        if ((coremap[frame].pte & PG_DIRTY)){
             swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
             if (swap_off == INVALID_SWAP){
                perror("Error invalid swap");
@@ -57,7 +57,7 @@ int allocate_frame(pgtbl_entry_t *p) {
         coremap[frame].pte->frame |= PG_ONSWAP;
         //set referece and dirty bit to 0
         coremap[frame].pte->frame &= (~PG_REF);
-        coremap[frame].pte->frame &= (~PG_);
+        coremap[frame].pte->frame &= (~PG_DIRTY);
 	}
 
 	// Record information for virtual page that will now be stored in frame
@@ -152,6 +152,7 @@ char *find_physpage(addr_t vaddr, char type) {
 	unsigned idx = PGDIR_INDEX(vaddr); // get index into page directory
 
 	// IMPLEMENTATION NEEDED
+	int frame_no;
 	// Use top-level page directory to get pointer to 2nd-level page table
 	//(void)idx; // To keep compiler happy - remove when you have a real use.
 
@@ -165,12 +166,45 @@ char *find_physpage(addr_t vaddr, char type) {
     p = &(pgtbl[PGTBL_INDEX(vaddr)]);
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
+    if(p->frame & PG_VALID){
+        hit_count++;
+    }else{
+        miss_count++;
+        frame_no = allocate_frame(p);
+        if(frame_no == -1){
+            perror("error allocating_frame");
+        }
+        p->frame &= PG_ONSWAP;
+        p->frame &= PG_VALID;
+        p->frame &= PG_REF;
+        p->frame &= PG_DIRTY;
+        p->frame |= frame_no << PAGE_SHIFT;
+        if(p->frame & PG_ONSWAP){
+            //invalid and on swap, move back from disk
+            swap_pagein(frame_no, p->swap_off);
+            //page is in memory now, mark it as VALID
+            p->frame |= PG_VALID;
+
+        }else{
+            //page not on disk, first access
+            init_frame(frame_no,vaddr);
+            //mark it as DIRTY, so it will be written to swap when evicted
+            p->frame |= PG_DIRTY;
+            swap_pagein()
+        }
+    }
+
+    ref_count++;
 
 
 
 	// Make sure that p is marked valid and referenced. Also mark it
 	// dirty if the access type indicates that the page will be written to.
-
+    (p->frame) |= PG_VALID;
+	(p->frame) |= PG_REF;
+	if (type == 'S' || type == 'M'){
+		(p->frame) |= PG_DIRTY;
+	}
 
 
 	// Call replacement algorithm's ref_fcn for this page
