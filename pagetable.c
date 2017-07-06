@@ -40,12 +40,14 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// Write victim page to swap, if needed, and update pagetable
 		// IMPLEMENTATION NEEDED
 		pgtbl_entry_t *victom_pte = coremap[frame].pte;
-		victom_pte->frame |= ~PG_VALID;
+		off_t victom_swap_off = victom_pte->swap_off;
 
-		if (victom_pte -> frame & PG_DIRTY) {
-			off_t victom_swap_off = victom_pte->swap_off;
+		victom_pte->frame ^= PG_VALID;
+		victom_pte->frame |= PG_ONSWAP;
+
+		if (victom_pte -> frame & PG_DIRTY) {			
 			victom_swap_off = swap_pageout(frame, victom_swap_off);
-			//update dirty count
+			victom_pte->frame ^= PG_DIRTY;//not dirty anymore after put on the disk			
 			evict_dirty_count ++; 
 		}
 		else {
@@ -154,12 +156,12 @@ char *find_physpage(addr_t vaddr, char type) {
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
 	// if pde is invalid, init second level
-	if (!(pgdir[idx].pde & PG_VALID)){
+	if (pgdir[idx].pde == 0){
 		pgdir[idx] = init_second_level();	
 	}
 	pgtbl_entry_t *pgtbl;
 	pgtbl = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK);
-	p = pgtbl[PGTBL_INDEX(vaddr)];
+	p = &pgtbl[PGTBL_INDEX(vaddr)];
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
     int frame_no;
