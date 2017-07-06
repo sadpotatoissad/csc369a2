@@ -42,8 +42,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 		pgtbl_entry_t *victom_pte = coremap[frame].pte;
 		off_t victom_swap_off = victom_pte->swap_off;
 
-		victom_pte->frame ^= PG_VALID;
-		victom_pte->frame |= PG_ONSWAP;
+
 
 		if (victom_pte -> frame & PG_DIRTY) {			
 			victom_swap_off = swap_pageout(frame, victom_swap_off);
@@ -53,7 +52,9 @@ int allocate_frame(pgtbl_entry_t *p) {
 		else {
 			// no need to write victim page, update clean count
 			evict_clean_count ++;
-		}	
+		}
+		victom_pte->frame ^= PG_VALID;
+		victom_pte->frame |= PG_ONSWAP;
 
 	}
 
@@ -161,7 +162,8 @@ char *find_physpage(addr_t vaddr, char type) {
 	}
 	pgtbl_entry_t *pgtbl;
 	pgtbl = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK);
-	p = &pgtbl[PGTBL_INDEX(vaddr)];
+	//p = &pgtbl[PGTBL_INDEX(vaddr)];
+	p = pgtbl + PGTBL_INDEX(vaddr);//should be the same
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
     int frame_no;
@@ -184,7 +186,7 @@ char *find_physpage(addr_t vaddr, char type) {
 		// page is not on disk, first time access the page
 		else {	
 			p->frame = frame_no << PAGE_SHIFT;		
-			init_frame(p->frame, vaddr);
+			init_frame(frame_no, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
 		}
