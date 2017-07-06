@@ -48,11 +48,14 @@ int (*evict_fcn)() = NULL;
  */
 void access_mem(char type, addr_t vaddr) {
 	char *memptr = find_physpage(vaddr, type);
+	
 	int *versionptr = (int *)memptr;
 	addr_t *checkaddr = (addr_t *)(memptr + sizeof(int));
 
 	if (*checkaddr != vaddr) {
 		fprintf(stderr,"Error, simulated page returned by pagetable lookup doese not have expected value.\n");
+		fprintf(stderr,"memptr=%p, vaddr=%p\n", (void *)(memptr), (void *)vaddr);
+		fprintf(stderr,"*checkaddr=%p, vaddr=%p\n", (void *)(*checkaddr), (void *)vaddr);
 	}
 	
 	if (type == 'S' || type == 'M') {
@@ -74,6 +77,7 @@ void replay_trace(FILE *infp) {
 			if(debug)  {
 				printf("%c %lx\n", type, vaddr);
 			}
+			printf("%c %lx\n", type, vaddr);
 			access_mem(type, vaddr);
 		} else {
 			continue;
