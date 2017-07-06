@@ -24,7 +24,7 @@ int evict_dirty_count = 0;
  * Counters for evictions should be updated appropriately in this function.
  */
 int allocate_frame(pgtbl_entry_t *p) {
-	int i;
+	int i, swap_off;
 	int frame = -1;
 	for(i = 0; i < memsize; i++) {
 		if(!coremap[i].in_use) {
@@ -39,17 +39,16 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// All frames were in use, so victim frame must hold some page
 		// Write victim page to swap, if needed, and update pagetable
 		// IMPLEMENTATION NEEDED
-
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
         //if dirty write victim page to swap
         if ((coremap[frame].pte |= ~PG_DIRTY)){
-            off_t swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
-            if ((int) swap_off == INVALID_SWAP){
+            swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
+            if (swap_off == INVALID_SWAP){
                perror("Error invalid swap");
                return -1;
             }
-            coremap[frame].pte->swap_off = swap_off;
+            coremap[frame].pte->swap_off = (off_t) swap_off;
             evict_dirty_count++;
         }else{
             //no need to write victim page, update clean count
@@ -154,12 +153,16 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	(void)idx; // To keep compiler happy - remove when you have a real use.
+	//(void)idx; // To keep compiler happy - remove when you have a real use.
 
-
+    //if pde is invalid, init second level
+    if(!(pgdir[idx].pde & PG_VALID)){
+        pgdir[idx] = init_second_level();
+    }
+    pgtbl_entry_t *pgtbl;
+    pgtbl = (pgtbl_entry_t*) (pgdir[idx].pde & PAGE_MASK);
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
-
-
+    p = &(pgtbl[PGTBL_INDEX(vaddr)]);
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 
