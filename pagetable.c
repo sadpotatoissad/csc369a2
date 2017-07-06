@@ -42,7 +42,7 @@ int allocate_frame(pgtbl_entry_t *p) {
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
         //if dirty write victim page to swap
-        if ((coremap[frame].pte & PG_DIRTY)){
+        if (coremap[frame].pte->frame & PG_DIRTY){
             swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
             if (swap_off == INVALID_SWAP){
                perror("Error invalid swap");
@@ -190,7 +190,7 @@ char *find_physpage(addr_t vaddr, char type) {
             init_frame(frame_no,vaddr);
             //mark it as DIRTY, so it will be written to swap when evicted
             p->frame |= PG_DIRTY;
-            swap_pagein()
+            swap_pagein(frame_no, p->swap_off);
         }
     }
 
