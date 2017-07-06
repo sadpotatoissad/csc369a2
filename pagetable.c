@@ -184,7 +184,7 @@ char *find_physpage(addr_t vaddr, char type) {
 		// page is not on disk, first time access the page
 		else {	
 			p->frame = frame_no << PAGE_SHIFT;		
-			init_frame(frame_no, vaddr);
+			init_frame(p->frame, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
 		}
