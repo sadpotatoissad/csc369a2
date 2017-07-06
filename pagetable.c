@@ -40,13 +40,11 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// Write victim page to swap, if needed, and update pagetable
 		// IMPLEMENTATION NEEDED
 		pgtbl_entry_t *victom_pte = coremap[frame].pte;
-		victom_pte |= ~PG_VALID;
-		//off_t victom_swap_off = victom_pte->swap_off;
-		//swap_pageout(frame, victom_swap_off);
+		victom_pte = (uintptr_t)victom_pte | ~PG_VALID;
 
 		if (victom_pte -> frame & PG_DIRTY) {
 			off_t victom_swap_off = victom_pte->swap_off;
-			victom_swap_off = wap_pageout(frame, victom_swap_off);
+			victom_swap_off = swap_pageout(frame, victom_swap_off);
 			//update dirty count
 			evict_dirty_count ++; 
 		}
@@ -155,17 +153,51 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-	pgdir[idx] = init_second_level();
-	p = pgdir[idx].
-
+	// if pde is invalid, init second level
+	if (!(pgdir[idx].pde & PG_VALID)){
+		pgdir[idx].pde = init_second_level()	
+	}
+	pgtbl_entry_t *pgtbl;
+	pgtbl = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK);
+	p = pgtbl[PGTBL_INDEX(vaddr)]
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
-
+    int frame_no;
+    
+    // if VALID is 1, page is in memory. it's a hit
+    if ((p->frame) & PG_VALID) { 
+		hit_count ++; 		
+	}
+	// else, page is not in memory. it's a miss
+	else {
+		miss_count ++;
+		//find a free frame_no or evict to get one for p
+		frame_no = allocate_frame(p);
+		
+		//ONSWAP is 1, page is on disk
+		if ((p->frame) & PG_ONSWAP) {
+			swap_pagein(frame_no, p->swap_off);
+			//page is in memory now, mark it as VALID
+			p->frame | PG_VALID;
+		}
+		// page is not on disk, first time access the page
+		else {			
+			init_frame(frame_no, vaddr);
+			//mark it as DIRTY, so it will be written to swap when evicted
+			p->frame |= PG_DIRTY;
+		}
+	}
 
 
 	// Make sure that p is marked valid and referenced. Also mark it
 	// dirty if the access type indicates that the page will be written to.
 
+	p->frame |= PG_VALID;
+	p->frame |= PG_REF;
+	ref_count ++;
+	if (type == 'S' || type == 'M'){
+		(p->frame) |= PG_DIRTY;
+	}
 
 
 	// Call replacement algorithm's ref_fcn for this page
