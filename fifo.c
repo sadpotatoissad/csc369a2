@@ -52,16 +52,31 @@ int fifo_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void fifo_ref(pgtbl_entry_t *p) {
-    struct frame *frame;
-    struct
+    struct frame *hold_frame;
+    struct frame *cur_frame;
+    int frame_location;
+    frame_location = (p->frame) >> PAGE_SHIFT;
+    cur_frame = &(coremap[location]);
     if(frame_head == nullptr){
+        frame_head = cur_rame;
+        frame_tail = cur_frame;
+        frame_head->next = nullptr;
         count = 1;
     }
-    else{
-
+    else if (count == memsize){
+        //out of mem
+        perror("out of mem");
+        return;
     }
-
-
+    else{
+        //if in queue
+        hold_frame = frame_head;
+        hold_frame->next = cur_frame;
+        frame_head = cur_frame;
+        f
+        frame
+        count++;
+    }
 	return;
 }
 
@@ -69,6 +84,7 @@ void fifo_ref(pgtbl_entry_t *p) {
  * replacement algorithm
  */
 void fifo_init() {
+    //initialize queue of frames
     num_frames = 0
     frame_head = nullptr;
     frame_tail = nullptr;
