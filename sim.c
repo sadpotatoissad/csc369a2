@@ -61,6 +61,7 @@ void access_mem(char type, addr_t vaddr) {
 	if (type == 'S' || type == 'M') {
 		// write access to page, increment version number
 		(*versionptr)++;
+        printf("modify %d \n", *versionptr);
 	}
 
 }
