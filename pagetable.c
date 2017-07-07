@@ -207,6 +207,7 @@ char *find_physpage(addr_t vaddr, char type) {
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
 
+	printf("keyan %d\n"p->frame >> PAGE_SHIFT);
 	// Return pointer into (simulated) physical memory at start of frame
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];
 }
