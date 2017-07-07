@@ -29,20 +29,21 @@ int fifo_evict() {
     //remove tail from frame list (the first frame in)
     if(num_frames == 1){
         num_frames--;
-        frame_head = nullptr;
-        frame_tail = nullptr;
+        frames_head = nullptr;
+        frames_tail = nullptr;
     }
     else if (num_frames == 2){
-        frame = frame_tail;
-        frame_tail = frame_tail->next;
-        frame_tail.next = nullptr;
+        frame = frames_tail;
+        frames_tail = frame_tail->next;
+        frames_tail->next = nullptr;
         num_frames--;
     }
     else{
-        frame = frame_tail;
-        frame_tail = frame_tail->next;
+        frame = frames_tail;
+        frames_tail = frames_tail->next;
         num_frames--;
     }
+    //shift to provide correct frame number
     ret = (frame->pte->frame) >> PAGE_SHIFT;
 	return ret;
 }
@@ -55,16 +56,18 @@ void fifo_ref(pgtbl_entry_t *p) {
     struct frame *hold_frame;
     struct frame *cur_frame;
     int i, frame_location;
+    //shift to correct position
     frame_location = (p->frame) >> PAGE_SHIFT;
     cur_frame = &(coremap[location]);
     if(frame_head == nullptr){
-        frame_head = cur_rame;
-        frame_tail = cur_frame;
-        frame_head->next = nullptr;
+        //queue is empty
+        frames_head = cur_frame;
+        frames_tail = cur_frame;
+        frames_head->next = nullptr;
         num_frames = 1;
     }
-    else if (count == memsize){
-        //out of mem
+    else if (num_frames == memsize){
+        //out of memory case
         perror("out of mem");
         return;
     }
