@@ -54,14 +54,14 @@ int fifo_evict() {
 void fifo_ref(pgtbl_entry_t *p) {
     struct frame *hold_frame;
     struct frame *cur_frame;
-    int frame_location;
+    int i, frame_location;
     frame_location = (p->frame) >> PAGE_SHIFT;
     cur_frame = &(coremap[location]);
     if(frame_head == nullptr){
         frame_head = cur_rame;
         frame_tail = cur_frame;
         frame_head->next = nullptr;
-        count = 1;
+        num_frames = 1;
     }
     else if (count == memsize){
         //out of mem
@@ -69,13 +69,27 @@ void fifo_ref(pgtbl_entry_t *p) {
         return;
     }
     else{
-        //if in queue
+        bool in_queue;
+        in_queue = false;
+        //check if already in queue; if in queue, nothing to be done
+        hold_frame = frames_tail;
+        for (i = 0; i<num_frames; i++){
+            if(hold_frame == frames_head){
+                return;
+            }
+            hold_frame = hold_frame->next;
+
+        }
+        //not in queue, add frame to queue
+        if(in_queue){
+            return;
+        }
+        else{
         hold_frame = frame_head;
         hold_frame->next = cur_frame;
         frame_head = cur_frame;
-        f
-        frame
-        count++;
+        num_frames++;
+        }
     }
 	return;
 }
