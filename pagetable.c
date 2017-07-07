@@ -148,7 +148,8 @@ void init_frame(int frame, addr_t vaddr) {
  * this function.
  */
 char *find_physpage(addr_t vaddr, char type) {
-	pgtbl_entry_t *p=NULL; // pointer to the full page table entry for vaddr
+	printf("first line\n");
+    pgtbl_entry_t *p=NULL; // pointer to the full page table entry for vaddr
 	unsigned idx = PGDIR_INDEX(vaddr); // get index into page directory
 
 	// IMPLEMENTATION NEEDED
@@ -170,7 +171,8 @@ char *find_physpage(addr_t vaddr, char type) {
     
     // if VALID is 1, page is in memory. it's a hit
     if ((p->frame) & PG_VALID) { 
-		hit_count ++; 		
+		hit_count ++;
+        frame_no = p->frame >> PAGE_SHIFT; 		
 	}
 	// else, page is not in memory. it's a miss
 	else {
@@ -206,8 +208,11 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
-
-	printf("keyan %d\n"p->frame >> PAGE_SHIFT);
+    printf("before segfault\n");
+    char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
+    addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+    *vaddr_ptr = vaddr;
+	printf("keyan %d\n",p->frame >> PAGE_SHIFT);
 	// Return pointer into (simulated) physical memory at start of frame
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];
 }
