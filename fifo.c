@@ -11,14 +11,40 @@ extern int memsize;
 extern int debug;
 
 extern struct frame *coremap;
+static struct frame *frames_head;
+static struct frame *frames_tail;
+static int num_frames;
 
 /* Page to evict is chosen using the fifo algorithm.
  * Returns the page frame number (which is also the index in the coremap)
  * for the page that is to be evicted.
  */
 int fifo_evict() {
-	
-	return 0;
+    int ret;
+    struct frame *frame;
+    if(num_frames == 0){
+        perror("incorrect evict no frames in memory");
+        return -1;
+    }
+    //remove tail from frame list (the first frame in)
+    if(num_frames == 1){
+        num_frames--;
+        frame_head = nullptr;
+        frame_tail = nullptr;
+    }
+    else if (num_frames == 2){
+        frame = frame_tail;
+        frame_tail = frame_tail->next;
+        frame_tail.next = nullptr;
+        num_frames--;
+    }
+    else{
+        frame = frame_tail;
+        frame_tail = frame_tail->next;
+        num_frames--;
+    }
+    ret = (frame->pte->frame) >> PAGE_SHIFT;
+	return ret;
 }
 
 /* This function is called on each access to a page to update any information
@@ -26,12 +52,24 @@ int fifo_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void fifo_ref(pgtbl_entry_t *p) {
+    struct frame *frame;
+    struct
+    if(frame_head == nullptr){
+        count = 1;
+    }
+    else{
+
+    }
+
 
 	return;
 }
 
-/* Initialize any data structures needed for this 
- * replacement algorithm 
+/* Initialize any data structures needed for this
+ * replacement algorithm
  */
 void fifo_init() {
+    num_frames = 0
+    frame_head = nullptr;
+    frame_tail = nullptr;
 }
