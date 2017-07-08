@@ -68,7 +68,7 @@ void fifo_ref(pgtbl_entry_t *p) {
         frames_tail = cur_frame;
         frames_head->next = NULL;
         num_frames = 1;
-        pring("queue now has: %i\n", num_frames);
+        print("queue now has: %i\n", num_frames);
     }
     else if (num_frames == memsize){
         //out of memory case
