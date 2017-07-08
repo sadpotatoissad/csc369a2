@@ -31,10 +31,12 @@ int fifo_evict() {
         num_frames--;
         frames_head = NULL;
         frames_tail = NULL;
+        frames_tail->next = NULL;
     }
     else if (num_frames == 2){
         frame = frames_tail;
         frames_tail = frames_tail->next;
+        frames_head = frames_tail;
         frames_tail->next = NULL;
         num_frames--;
     }
@@ -45,7 +47,7 @@ int fifo_evict() {
     }
     //shift to provide correct frame number
     ret = (frame->pte->frame) >> PAGE_SHIFT;
-    printf("evicted");
+    printf("evicted %i\n", ret);
 	return ret;
 }
 
