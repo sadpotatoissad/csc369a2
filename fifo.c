@@ -72,9 +72,7 @@ void fifo_ref(pgtbl_entry_t *p) {
         return;
     }
     else{
-        bool in_queue;
-        in_queue = false;
-        //check if already in queue; if in queue, nothing to be done
+        //check if already in queue; if in queue, return
         hold_frame = frames_tail;
         for (i = 0; i<num_frames; i++){
             if(hold_frame == frames_head){
