@@ -45,6 +45,7 @@ int fifo_evict() {
     }
     //shift to provide correct frame number
     ret = (frame->pte->frame) >> PAGE_SHIFT;
+    printf("evicted");
 	return ret;
 }
 
@@ -53,6 +54,7 @@ int fifo_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void fifo_ref(pgtbl_entry_t *p) {
+    printf("check");
     struct frame *hold_frame;
     struct frame *cur_frame;
     int i, frame_location;
@@ -61,6 +63,7 @@ void fifo_ref(pgtbl_entry_t *p) {
     cur_frame = &(coremap[frame_location]);
     if(frames_head == NULL){
         //queue is empty
+        printf("queue is empty");
         frames_head = cur_frame;
         frames_tail = cur_frame;
         frames_head->next = NULL;
