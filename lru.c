@@ -22,7 +22,7 @@ static int num_frames;
 
 int lru_evict() {
     int ret;
-    struct frame *frame;
+    struct frame *frame_hold;
     if(num_frames == 0){
         perror("incorrect evict no frames in memory");
         return -1;
