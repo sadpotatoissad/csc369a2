@@ -83,10 +83,6 @@ void fifo_ref(pgtbl_entry_t *p) {
             hold_frame = hold_frame->next;
 
         }
-        //not in queue, add frame to queue
-        if(in_queue){
-            return;
-        }
         else{
         hold_frame = frame_head;
         hold_frame->next = cur_frame;
