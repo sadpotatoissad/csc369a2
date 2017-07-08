@@ -34,7 +34,7 @@ int fifo_evict() {
     }
     else if (num_frames == 2){
         frame = frames_tail;
-        frames_tail = frame_tail->next;
+        frames_tail = frames_tail->next;
         frames_tail->next = NULL;
         num_frames--;
     }
@@ -59,7 +59,7 @@ void fifo_ref(pgtbl_entry_t *p) {
     //shift to correct position
     frame_location = (p->frame) >> PAGE_SHIFT;
     cur_frame = &(coremap[frame_location]);
-    if(frame_head == NULL){
+    if(frames_head == NULL){
         //queue is empty
         frames_head = cur_frame;
         frames_tail = cur_frame;
