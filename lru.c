@@ -48,6 +48,7 @@ int lru_evict() {
         num_frames--;
     }
     //shift to provide correct frame number
+    frame->next = NULL;
     ret = (frame->pte->frame) >> PAGE_SHIFT;
     printf("evicted %i\n", ret);
 	return ret;

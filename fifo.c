@@ -46,6 +46,7 @@ int fifo_evict() {
         frames_tail = frames_tail->next;
         num_frames--;
     }
+    frame->next = NULL;
     //shift to provide correct frame number
     ret = (frame->pte->frame) >> PAGE_SHIFT;
     printf("evicted %i\n", ret);
