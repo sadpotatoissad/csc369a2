@@ -29,13 +29,13 @@ int fifo_evict() {
     //remove tail from frame list (the first frame in)
     if(num_frames == 1){
         num_frames--;
-        frames_head = nullptr;
-        frames_tail = nullptr;
+        frames_head = NULL;
+        frames_tail = NULL;
     }
     else if (num_frames == 2){
         frame = frames_tail;
         frames_tail = frame_tail->next;
-        frames_tail->next = nullptr;
+        frames_tail->next = NULL;
         num_frames--;
     }
     else{
@@ -58,12 +58,12 @@ void fifo_ref(pgtbl_entry_t *p) {
     int i, frame_location;
     //shift to correct position
     frame_location = (p->frame) >> PAGE_SHIFT;
-    cur_frame = &(coremap[location]);
-    if(frame_head == nullptr){
+    cur_frame = &(coremap[frame_location]);
+    if(frame_head == NULL){
         //queue is empty
         frames_head = cur_frame;
         frames_tail = cur_frame;
-        frames_head->next = nullptr;
+        frames_head->next = NULL;
         num_frames = 1;
     }
     else if (num_frames == memsize){
@@ -81,12 +81,10 @@ void fifo_ref(pgtbl_entry_t *p) {
             hold_frame = hold_frame->next;
 
         }
-        else{
-        hold_frame = frame_head;
+        hold_frame = frames_head;
         hold_frame->next = cur_frame;
-        frame_head = cur_frame;
+        frames_head = cur_frame;
         num_frames++;
-        }
     }
 	return;
 }
@@ -96,7 +94,7 @@ void fifo_ref(pgtbl_entry_t *p) {
  */
 void fifo_init() {
     //initialize queue of frames
-    num_frames = 0
-    frame_head = nullptr;
-    frame_tail = nullptr;
+    num_frames = 0;
+    frames_head = NULL;
+    frames_tail = NULL;
 }
