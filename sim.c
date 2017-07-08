@@ -78,7 +78,8 @@ void replay_trace(FILE *infp) {
 			if(debug)  {
 				printf("%c %lx\n", type, vaddr);
 			}
-			printf("%c %lx\n", type, vaddr);
+			printf("\n"); // for debug
+			printf("%c %lx\n", type, vaddr); // for debug
 			access_mem(type, vaddr);
 		} else {
 			continue;
@@ -125,6 +126,14 @@ int main(int argc, char *argv[]) {
 	// This happens before calling the replacement algorithm init function
 	// so that the init_fcn can refer to the coremap if needed.
 	coremap = malloc(memsize * sizeof(struct frame));
+	
+	// for debug
+	int i;
+	printf("init coremap\n");
+	for (i=0; i<memsize; i++){
+		printf("i=%d, coremap[%d].in_use=%d\n", i,i,coremap[i].in_use);
+	}
+	
 	physmem = malloc(memsize * SIMPAGESIZE);
 	swap_init(swapsize);
 	init_pagetable();

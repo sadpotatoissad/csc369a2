@@ -27,15 +27,19 @@ int allocate_frame(pgtbl_entry_t *p) {
 	int i, swap_off;
 	int frame = -1;
 	for(i = 0; i < memsize; i++) {
+		printf("i=%d, coremap[%d].in_use=%d\n", i,i,coremap[i].in_use);
 		if(!coremap[i].in_use) {
 			frame = i;
+			if (i < memsize+1){
+				printf("i=%d, coremap[%d].in_use=%d\n", i+1,i+1,coremap[i+1].in_use);
+			}
 			break;
 		}
 	}
 	if(frame == -1) { // Didn't find a free page.
 		// Call replacement algorithm's evict function to select victim
 		frame = evict_fcn();
-
+		printf("evict frame %d\n", frame);
 		// All frames were in use, so victim frame must hold some page
 		// Write victim page to swap, if needed, and update pagetable
 		// IMPLEMENTATION NEEDED
@@ -163,7 +167,10 @@ char *find_physpage(addr_t vaddr, char type) {
     pgtbl_entry_t *pgtbl;
     pgtbl = (pgtbl_entry_t*) (pgdir[idx].pde & PAGE_MASK);
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
-    p = &(pgtbl[PGTBL_INDEX(vaddr)]);
+	int j;
+	j = PGTBL_INDEX(vaddr);
+	p = pgtbl + j;
+    //p = &(pgtbl[PGTBL_INDEX(vaddr)]);
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 	int frame_no;
@@ -207,9 +214,13 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
+	
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     *vaddr_ptr = vaddr;
+    
+    printf("frame_no = %d\n",frame_no); // for debug
+
 	// Return pointer into (simulated) physical memory at start of frame
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];
 }
@@ -241,7 +252,7 @@ void print_pagetbl(pgtbl_entry_t *pgtbl) {
 				printf("in frame %d\n",pgtbl[i].frame >> PAGE_SHIFT);
 			} else {
 				assert(pgtbl[i].frame & PG_ONSWAP);
-				printf("ONSWAP, at offset %lu\n",pgtbl[i].swap_off);
+				printf("ONSWAP, at offset %lld\n",pgtbl[i].swap_off);
 			}
 		}
 	}
