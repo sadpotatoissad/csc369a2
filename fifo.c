@@ -90,10 +90,10 @@ void fifo_ref(pgtbl_entry_t *p) {
         num_frames++;
     }
     printf("current queue start");
+    hold_frame = frames_tail;
     for (i = 0; i<num_frames; i++){
         printf("%i",((hold_frame->pte->frame)>>12));
         hold_frame = hold_frame->next;
-
         }
     printf("current queue end");
 	return;
