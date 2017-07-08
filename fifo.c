@@ -91,11 +91,8 @@ void fifo_ref(pgtbl_entry_t *p) {
     }
     printf("current queue start");
     for (i = 0; i<num_frames; i++){
-            if(hold_frame == frames_head){
-                return;
-            }
-            printf("%i",((hold_frame->pte->frame)>>12));
-            hold_frame = hold_frame->next;
+        printf("%i",((hold_frame->pte->frame)>>12));
+        hold_frame = hold_frame->next;
 
         }
     printf("current queue end");
