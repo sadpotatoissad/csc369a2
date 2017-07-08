@@ -106,7 +106,7 @@ void fifo_ref(pgtbl_entry_t *p) {
         char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
         // Calculate pointer to location in page where we keep the vaddr
         addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
-        printf("%x\n",(unsigned int)*vaddr_ptr);
+        printf("%x\n",(int)*vaddr_ptr);
         temp_frame = temp_frame->next;
        }
    printf("current queue end\n");
