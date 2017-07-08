@@ -30,6 +30,7 @@ int lru_evict() {
     //remove tail from frame list (the first frame in)
     if(num_frames == 1){
         num_frames--;
+        frame = frames_tail;
         frames_head = NULL;
         frames_tail = NULL;
         frames_tail->next = NULL;
