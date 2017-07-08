@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
+#include "pagetable.c"
 
 
 extern int memsize;
@@ -111,7 +112,7 @@ void fifo_ref(pgtbl_entry_t *p) {
    printf("current queue end\n");
         temp_frame = temp_frame->next;
 
-        }
+
 
     printf("current queue end\n");
 	return;
