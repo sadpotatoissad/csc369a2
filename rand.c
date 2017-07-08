@@ -16,6 +16,7 @@ extern struct frame *coremap;
  */
 int rand_evict() {
 	// choose index in coremap to evict a page from
+	
 	int idx = (int)(random() % memsize);
 	
 	return idx;

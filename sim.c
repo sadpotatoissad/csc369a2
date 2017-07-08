@@ -48,7 +48,6 @@ int (*evict_fcn)() = NULL;
  */
 void access_mem(char type, addr_t vaddr) {
 	char *memptr = find_physpage(vaddr, type);
-	
 	int *versionptr = (int *)memptr;
 	addr_t *checkaddr = (addr_t *)(memptr + sizeof(int));
 
@@ -125,12 +124,14 @@ int main(int argc, char *argv[]) {
 	// Initialize main data structures for simulation.
 	// This happens before calling the replacement algorithm init function
 	// so that the init_fcn can refer to the coremap if needed.
-	coremap = malloc(memsize * sizeof(struct frame));
-	
+	coremap = calloc(memsize, sizeof(struct frame));
+	//add by Bin
+	//memset(coremap, 0, memsize); // zero-fill the coremap, add by bin
 	// for debug
 	int i;
 	printf("init coremap\n");
 	for (i=0; i<memsize; i++){
+		//coremap[i].in_use = 0;
 		printf("i=%d, coremap[%d].in_use=%d\n", i,i,coremap[i].in_use);
 	}
 	
