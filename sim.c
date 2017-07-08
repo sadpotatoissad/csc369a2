@@ -126,7 +126,6 @@ int main(int argc, char *argv[]) {
 	// so that the init_fcn can refer to the coremap if needed.
 	coremap = calloc(memsize, sizeof(struct frame));
 	//add by Bin
-	//memset(coremap, 0, memsize); // zero-fill the coremap, add by bin
 	// for debug
 	int i;
 	printf("init coremap\n");

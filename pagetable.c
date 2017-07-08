@@ -210,13 +210,16 @@ char *find_physpage(addr_t vaddr, char type) {
 	if (type == 'S' || type == 'M'){
 		(p->frame) |= PG_DIRTY;
 	}
-
-	// Call replacement algorithm's ref_fcn for this page
-	ref_fcn(p);
 	
+	//update vadd in physmem
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     *vaddr_ptr = vaddr;
+    
+	// Call replacement algorithm's ref_fcn for this page
+	ref_fcn(p);
+	
+
 
 	// Return pointer into (simulated) physical memory at start of frame
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];

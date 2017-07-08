@@ -4,10 +4,9 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
-#include "pagetable.c"
+#include "sim.h"  // add this by Bin just for printing vadrr
 
-
-extern int memsize;
+extern unsigned memsize; // modified type of memsize from int to unsigned by Bin just for printing vaddr
 
 extern int debug;
 
@@ -22,13 +21,15 @@ static int num_frames;
  */
 int fifo_evict() {
     int ret;
-    struct frame *frame;
+    struct frame *frame_hold;
     if(num_frames == 0){
         perror("incorrect evict no frames in memory");
         return -1;
     }
     //remove tail from frame list (the first frame in)
+    /*
     if(num_frames == 1){
+		frame = ??
         num_frames--;
         frame = frames_tail;
         frames_head = NULL;
@@ -47,9 +48,14 @@ int fifo_evict() {
         frames_tail = frames_tail->next;
         num_frames--;
     }
-    frame->next = NULL;
+    * */
     //shift to provide correct frame number
-    ret = (frame->pte->frame) >> PAGE_SHIFT;
+    frame_hold = frames_head;
+    frames_head = frames_head->next;
+    frames_tail->next = frame_hold;
+    frames_tail = frame_hold;
+    frame_hold->next = NULL;
+    ret = (frame_hold->pte->frame) >> PAGE_SHIFT;
     printf("evicted %i\n", ret);
 	return ret;
 }
@@ -63,10 +69,12 @@ void fifo_ref(pgtbl_entry_t *p) {
     struct frame *hold_frame;
     struct frame *temp_frame;
     struct frame *cur_frame;
-    int i, frame_location;
+    int i, frame_no;
+    
     //shift to correct position
-    frame_location = (p->frame) >> PAGE_SHIFT;
-    cur_frame = &(coremap[frame_location]);
+    frame_no = (p->frame) >> PAGE_SHIFT;
+    hold_frame = &(coremap[frame_no]);
+    /*
     if(frames_head == NULL){
         //queue is empty
         printf("queue is empty\n");
@@ -97,16 +105,48 @@ void fifo_ref(pgtbl_entry_t *p) {
         frames_head = cur_frame;
         num_frames++;
     }
+    * */
+    
+    
+    if (num_frames == 0){
+		frames_head = hold_frame;
+		frames_tail = hold_frame;
+		num_frames++;
+	}
+	else {
+		//check if hold_frame is in the list, if in, no change
+		int flag = 0;
+		cur_frame = frames_head;
+		for (i = 0; i < num_frames; i++){
+			if (cur_frame == hold_frame){
+				flag = 1;
+				break;
+			}
+			cur_frame = cur_frame->next;
+		}
+		// hold_frame is not in the list, add hold_frame to the tail
+		if (flag == 0){
+			assert(num_frames < memsize);
+			frames_tail->next = hold_frame;
+			frames_tail = hold_frame;
+			hold_frame->next = NULL;
+			num_frames++;
+			
+		}
+	
+	}
+
+	
     printf("current queue start\n");
-    temp_frame = frames_tail;
+    temp_frame = frames_head;
     for (i = 0; i<num_frames; i++){
-        //printf("%i\n",((temp_frame->pte->frame)>>12));
-        int temp_frame_no = (temp_frame->pte->frame)>>12;
-        // Calculate pointer to start of frame in (simulated) physical memory
-        char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
-        // Calculate pointer to location in page where we keep the vaddr
-        addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
-        printf("%x\n",(int)*vaddr_ptr);
+		// in order to print vaddr 
+		int temp_frame_no = (temp_frame->pte->frame)>>12;
+		// Calculate pointer to start of frame in (simulated) physical memory
+		char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
+		// Calculate pointer to location in page where we keep the vaddr
+		addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+        printf("%0lx\n",*vaddr_ptr);
         temp_frame = temp_frame->next;
        }
    printf("current queue end\n");
