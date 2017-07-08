@@ -99,9 +99,20 @@ void fifo_ref(pgtbl_entry_t *p) {
     printf("current queue start\n");
     temp_frame = frames_tail;
     for (i = 0; i<num_frames; i++){
-        printf("%i\n",((temp_frame->pte->frame)>>12));
+        //printf("%i\n",((temp_frame->pte->frame)>>12));
+        int temp_frame_no = (temp_frame->pte->frame)>>12;
+        // Calculate pointer to start of frame in (simulated) physical memory
+        char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
+        // Calculate pointer to location in page where we keep the vaddr
+        addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+        printf("%0x\n",*vaddr_ptr);
         temp_frame = temp_frame->next;
+       }
+   printf("current queue end\n");
+        temp_frame = temp_frame->next;
+
         }
+
     printf("current queue end\n");
 	return;
 }
