@@ -28,30 +28,15 @@ int lru_evict() {
         return -1;
     }
     //remove tail from frame list (the first frame in)
-    if(num_frames == 1){
-        num_frames--;
-        frame = frames_tail;
-        frames_head = NULL;
-        frames_tail = NULL;
-        frames_tail->next = NULL;
-    }
-    else if (num_frames == 2){
-        frame = frames_tail;
-        frames_tail = frames_tail->next;
-        frames_head = frames_tail;
-        frames_tail->next = NULL;
-        num_frames--;
-    }
-    else{
-        frame = frames_tail;
-        frames_tail = frames_tail->next;
-        num_frames--;
-    }
-    //shift to provide correct frame number
-    frame->next = NULL;
-    ret = (frame->pte->frame) >> PAGE_SHIFT;
+    frame_hold = frames_head;
+    frames_head = frames_head->next;
+    frames_tail->next = frame_hold;
+    frames_tail = frame_hold;
+    frame_hold->next = NULL;
+    ret = (frame_hold->pte->frame) >> PAGE_SHIFT;
     printf("evicted %i\n", ret);
 	return ret;
+
 }
 
 /* This function is called on each access to a page to update any information
