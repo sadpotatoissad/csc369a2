@@ -63,11 +63,12 @@ void fifo_ref(pgtbl_entry_t *p) {
     cur_frame = &(coremap[frame_location]);
     if(frames_head == NULL){
         //queue is empty
-        printf("queue is empty");
+        printf("queue is empty\n");
         frames_head = cur_frame;
         frames_tail = cur_frame;
         frames_head->next = NULL;
         num_frames = 1;
+        pring("queue now has: %i\n", num_frames);
     }
     else if (num_frames == memsize){
         //out of memory case
@@ -89,13 +90,13 @@ void fifo_ref(pgtbl_entry_t *p) {
         frames_head = cur_frame;
         num_frames++;
     }
-    printf("current queue start");
+    printf("current queue start\n");
     hold_frame = frames_tail;
     for (i = 0; i<num_frames; i++){
-        printf("%i",((hold_frame->pte->frame)>>12));
+        printf("%i\n",((hold_frame->pte->frame)>>12));
         hold_frame = hold_frame->next;
         }
-    printf("current queue end");
+    printf("current queue end\n");
 	return;
 }
 
