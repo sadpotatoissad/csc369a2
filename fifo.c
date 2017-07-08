@@ -77,9 +77,9 @@ void fifo_ref(pgtbl_entry_t *p) {
     }
     else{
         //check if already in queue; if in queue, return
-        hold_frame = cur_frame;
+        hold_frame = frames_tail;
         for (i = 0; i<num_frames; i++){
-            if(hold_frame == frames_head){
+            if(hold_frame == cur_frame){
                 return;
             }
             hold_frame = hold_frame->next;
