@@ -83,6 +83,7 @@ void fifo_ref(pgtbl_entry_t *p) {
         hold_frame = frames_tail;
         for (i = 0; i<num_frames; i++){
             if(hold_frame == cur_frame){
+                printf("already in queue, matching hold_frame %i with cur_frame %i\n", ((hold_frame->pte->frame)>>12),((cur_frame->pte->frame)>>12) );
                 return;
             }
             hold_frame = hold_frame->next;
