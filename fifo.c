@@ -58,6 +58,7 @@ int fifo_evict() {
 void fifo_ref(pgtbl_entry_t *p) {
     printf("check");
     struct frame *hold_frame;
+    struct frame *temp_frame;
     struct frame *cur_frame;
     int i, frame_location;
     //shift to correct position
@@ -72,7 +73,7 @@ void fifo_ref(pgtbl_entry_t *p) {
         num_frames = 1;
         printf("queue now has: %i\n", num_frames);
     }
-    else if (num_frames == memsize){
+    else if (!(num_frames < memsize)){
         //out of memory case
         perror("out of mem");
         return;
@@ -93,10 +94,10 @@ void fifo_ref(pgtbl_entry_t *p) {
         num_frames++;
     }
     printf("current queue start\n");
-    hold_frame = frames_tail;
+    temp_frame = frames_tail;
     for (i = 0; i<num_frames; i++){
-        printf("%i\n",((hold_frame->pte->frame)>>12));
-        hold_frame = hold_frame->next;
+        printf("%i\n",((temp_frame->pte->frame)>>12));
+        temp_frame = temp_frame->next;
         }
     printf("current queue end\n");
 	return;
