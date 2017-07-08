@@ -91,7 +91,7 @@ void fifo_ref(pgtbl_entry_t *p) {
             if(hold_frame == frames_head){
                 return;
             }
-            printf("%f",((hold_frame->pte->frame)>>12));
+            printf("%i",((hold_frame->pte->frame)>>12));
             hold_frame = hold_frame->next;
 
         }
