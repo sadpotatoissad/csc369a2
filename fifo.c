@@ -50,7 +50,7 @@ int fifo_evict() {
     }
     * */
     //if only one frame in memory
-    if((memsize == 1)&& ( num_frames == 1)){
+    if((memsize == 1)&& (num_frames == 1)){
         num_frames--;
         frame_hold = frames_head;
         frames_head = NULL;
@@ -131,7 +131,7 @@ void fifo_ref(pgtbl_entry_t *p) {
 		for (i = 0; i < num_frames; i++){
 			if (cur_frame == hold_frame){
 				flag = 1;
-				return;
+				break;
 			}
 			cur_frame = cur_frame->next;
 		}
@@ -158,11 +158,6 @@ void fifo_ref(pgtbl_entry_t *p) {
         printf("%0lx\n",*vaddr_ptr);
         temp_frame = temp_frame->next;
        }
-   printf("current queue end\n");
-        temp_frame = temp_frame->next;
-
-
-
     printf("current queue end\n");
 	return;
 }
