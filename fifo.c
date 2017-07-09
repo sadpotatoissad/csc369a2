@@ -174,7 +174,5 @@ void fifo_init() {
     //initialize queue of frames
     num_frames = 0;
     frames_head = NULL;
-    frames_head->next = NULL;
-    frames_tail->next = NULL;
     frames_tail = NULL;
 }
