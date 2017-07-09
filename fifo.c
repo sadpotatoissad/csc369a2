@@ -50,7 +50,7 @@ int fifo_evict() {
     }
     * */
     //if only one frame in memory
-    if((memsize == 1)&& (num_frames == 1)){
+    if((memsize == 1)&&(num_frames == 1)){
         num_frames--;
         frame_hold = frames_head;
         frames_head = NULL;
@@ -61,9 +61,9 @@ int fifo_evict() {
     frames_head = frames_head->next;
     //frames_tail->next = frame_hold;
     //frames_tail = frame_hold;
-    //frame_hold->next = NULL;
+    frame_hold->next = NULL;
     ret = ((frame_hold->pte->frame) >> PAGE_SHIFT);
-    printf("evicted %i\n", ret);
+    printf("evicted %i (evict function)\n", ret);
 	return ret;
 }
 
