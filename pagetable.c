@@ -42,7 +42,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// IMPLEMENTATION NEEDED
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
-        printf("before segfault after set evicted page valid to 0\n")
+        printf("before segfault after set evicted page valid to 0\n");
         //if dirty write victim page to swap
         if ((coremap[frame].pte)-> frame & PG_DIRTY){
             swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
