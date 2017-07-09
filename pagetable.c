@@ -220,9 +220,11 @@ char *find_physpage(addr_t vaddr, char type) {
 	}
 
 	//update vadd in physmem
-	printf("before sig fault (right before vadd update\n");
+	printf("before sig fault (right before vadd update)\n");
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
+    printf("mem_ptr success\n");
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+    printf("prob after seg fault (vaddr_ptr)\n");
     *vaddr_ptr = vaddr;
 
 	// Call replacement algorithm's ref_fcn for this page
