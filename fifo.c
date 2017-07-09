@@ -131,7 +131,7 @@ void fifo_ref(pgtbl_entry_t *p) {
 		for (i = 0; i < num_frames; i++){
 			if (cur_frame == hold_frame){
 				flag = 1;
-				break;
+				return;
 			}
 			cur_frame = cur_frame->next;
 		}
@@ -174,5 +174,7 @@ void fifo_init() {
     //initialize queue of frames
     num_frames = 0;
     frames_head = NULL;
+    frames_head->next = NULL;
+    frames_tail->next = NULL;
     frames_tail = NULL;
 }
