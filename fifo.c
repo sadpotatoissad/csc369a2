@@ -55,7 +55,7 @@ int fifo_evict() {
         frame_hold = frames_head;
         frames_head = NULL;
         frames_tail = NULL;
-        return frame_hold;
+        return ((frame_hold->pte->frame) >> PAGE_SHIFT);
     }
     frame_hold = frames_head;
     frames_head = frames_head->next;
