@@ -226,7 +226,7 @@ char *find_physpage(addr_t vaddr, char type) {
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     printf("prob before seg fault (vaddr_ptr)\n");
     *vaddr_ptr = vaddr;
-    print("prob before\n");
+    printf("prob before\n");
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
 
