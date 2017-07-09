@@ -42,6 +42,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// IMPLEMENTATION NEEDED
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
+        printf("before segfault after set evicted page valid to 0\n")
         //if dirty write victim page to swap
         if ((coremap[frame].pte)-> frame & PG_DIRTY){
             swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
@@ -51,6 +52,7 @@ int allocate_frame(pgtbl_entry_t *p) {
             }
             coremap[frame].pte->swap_off = (off_t) swap_off;
             evict_dirty_count++;
+            printf("dirtyevict before seg?\n");
         }else{
             //no need to write victim page, update clean count
             evict_clean_count++;
@@ -160,7 +162,7 @@ char *find_physpage(addr_t vaddr, char type) {
     if(!(pgdir[idx].pde & PG_VALID)){
         pgdir[idx] = init_second_level();
     }
-    
+
     pgtbl_entry_t *pgtbl;
     pgtbl = (pgtbl_entry_t*) (pgdir[idx].pde & PAGE_MASK);
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
@@ -169,11 +171,11 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 	int frame_no;
-    
+
     // if VALID is 1, page is in memory. it's a hit
-    if ((p->frame) & PG_VALID) { 
+    if ((p->frame) & PG_VALID) {
 		hit_count ++;
-        frame_no = p->frame >> PAGE_SHIFT; 		
+        frame_no = p->frame >> PAGE_SHIFT;
 	}
 	// else, page is not in memory. it's a miss
 	else {
@@ -183,11 +185,11 @@ char *find_physpage(addr_t vaddr, char type) {
 		if(frame_no == -1){
             perror("error allocating_frame");
         }
-        
+
         //Bin modified here
         p->frame &= PAGE_SHIFT-1;
         p->frame |= frame_no << PAGE_SHIFT;
-        
+
 		//ONSWAP is 1, page is on disk
 		if ((p->frame) & PG_ONSWAP) {
 			swap_pagein(frame_no, p->swap_off);
@@ -195,7 +197,7 @@ char *find_physpage(addr_t vaddr, char type) {
 			p->frame |= PG_VALID;
 		}
 		// page is not on disk, first time access the page
-		else {			
+		else {
 			init_frame(frame_no, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
@@ -210,15 +212,15 @@ char *find_physpage(addr_t vaddr, char type) {
 	if (type == 'S' || type == 'M'){
 		(p->frame) |= PG_DIRTY;
 	}
-	
+
 	//update vadd in physmem
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     *vaddr_ptr = vaddr;
-    
+
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
-	
+
 
 
 	// Return pointer into (simulated) physical memory at start of frame
