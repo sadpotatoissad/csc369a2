@@ -66,7 +66,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 	// Record information for virtual page that will now be stored in frame
 	coremap[frame].in_use = 1;
 	coremap[frame].pte = p;
-
+    printf("rightbefore return\n");
 	return frame;
 }
 
