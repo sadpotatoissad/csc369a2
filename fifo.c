@@ -26,7 +26,7 @@ int fifo_evict() {
         perror("incorrect evict no frames in memory");
         return -1;
     }
-    //remove tail from frame list (the first frame in)
+    //remove head from frame list (the first frame in)
     /*
     if(num_frames == 1){
 		frame = ??
@@ -49,13 +49,20 @@ int fifo_evict() {
         num_frames--;
     }
     * */
-    //shift to provide correct frame number
+    //if only one frame in memory
+    if(num_frames == 1){
+        num_frames--;
+        frame_hold = frames_head;
+        frames_head = NULL;
+        frames_tail = NULL;
+        return frame_hold;
+    }
     frame_hold = frames_head;
     frames_head = frames_head->next;
-    frames_tail->next = frame_hold;
-    frames_tail = frame_hold;
-    frame_hold->next = NULL;
-    ret = (frame_hold->pte->frame) >> PAGE_SHIFT;
+    //frames_tail->next = frame_hold;
+    //frames_tail = frame_hold;
+    //frame_hold->next = NULL;
+    ret = ((frame_hold->pte->frame) >> PAGE_SHIFT);
     printf("evicted %i\n", ret);
 	return ret;
 }
@@ -70,7 +77,7 @@ void fifo_ref(pgtbl_entry_t *p) {
     struct frame *temp_frame;
     struct frame *cur_frame;
     int i, frame_no;
-    
+
     //shift to correct position
     frame_no = (p->frame) >> PAGE_SHIFT;
     hold_frame = &(coremap[frame_no]);
@@ -106,11 +113,15 @@ void fifo_ref(pgtbl_entry_t *p) {
         num_frames++;
     }
     * */
-    
-    
+
+
     if (num_frames == 0){
+        //first frame to be added
 		frames_head = hold_frame;
 		frames_tail = hold_frame;
+        hold_frame->next = NULL;
+		frames_head->next = NULL;
+		frames_tail->next = NULL;
 		num_frames++;
 	}
 	else {
@@ -131,16 +142,14 @@ void fifo_ref(pgtbl_entry_t *p) {
 			frames_tail = hold_frame;
 			hold_frame->next = NULL;
 			num_frames++;
-			
-		}
-	
-	}
 
-	
+		}
+
+	}
     printf("current queue start\n");
     temp_frame = frames_head;
     for (i = 0; i<num_frames; i++){
-		// in order to print vaddr 
+		// in order to print vaddr
 		int temp_frame_no = (temp_frame->pte->frame)>>12;
 		// Calculate pointer to start of frame in (simulated) physical memory
 		char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
