@@ -151,6 +151,7 @@ void init_frame(int frame, addr_t vaddr) {
  * this function.
  */
 char *find_physpage(addr_t vaddr, char type) {
+    printf("entered find physspage\n");
     pgtbl_entry_t *p=NULL; // pointer to the full page table entry for vaddr
 	unsigned idx = PGDIR_INDEX(vaddr); // get index into page directory
 
@@ -185,10 +186,11 @@ char *find_physpage(addr_t vaddr, char type) {
 		if(frame_no == -1){
             perror("error allocating_frame");
         }
-
+        printf("miss count\n");
         //Bin modified here
         p->frame &= PAGE_SHIFT-1;
         p->frame |= frame_no << PAGE_SHIFT;
+        printf("aftershifting\n");
 
 		//ONSWAP is 1, page is on disk
 		if ((p->frame) & PG_ONSWAP) {
@@ -224,6 +226,7 @@ char *find_physpage(addr_t vaddr, char type) {
 
 
 	// Return pointer into (simulated) physical memory at start of frame
+	printf("findpys finishes\n");
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];
 }
 
