@@ -50,7 +50,7 @@ int fifo_evict() {
     }
     * */
     //if only one frame in memory
-    if(num_frames == 1){
+    if((memsize == 1)&& ( num_frames == 1)){
         num_frames--;
         frame_hold = frames_head;
         frames_head = NULL;
