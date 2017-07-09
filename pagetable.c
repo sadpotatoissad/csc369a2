@@ -198,12 +198,15 @@ char *find_physpage(addr_t vaddr, char type) {
 			swap_pagein(frame_no, p->swap_off);
 			//page is in memory now, mark it as VALID
 			p->frame |= PG_VALID;
+			printf("page swapped in\n");
 		}
 		// page is not on disk, first time access the page
 		else {
+            printf("page not on disk\n");
 			init_frame(frame_no, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
+            printf("have initialized\n");
 		}
 	}
 
@@ -217,6 +220,7 @@ char *find_physpage(addr_t vaddr, char type) {
 	}
 
 	//update vadd in physmem
+	printf("before sig fault (right before vadd update\n");
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     *vaddr_ptr = vaddr;
