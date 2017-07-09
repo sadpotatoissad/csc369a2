@@ -177,6 +177,7 @@ char *find_physpage(addr_t vaddr, char type) {
     if ((p->frame) & PG_VALID) {
 		hit_count ++;
         frame_no = p->frame >> PAGE_SHIFT;
+        coremap[frame_no].ref = 1;
 	}
 	// else, page is not in memory. it's a miss
 	else {

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
 
 #define TRACE_64
 
@@ -66,6 +67,8 @@ struct frame {
 	pgtbl_entry_t *pte;// Pointer back to pagetable entry (pte) for page
 	                   // stored in this frame
     struct frame* next; //points to the next frame
+    char ref;
+    clock_t current_time;
 };
 
 /* The coremap holds information about physical memory.
