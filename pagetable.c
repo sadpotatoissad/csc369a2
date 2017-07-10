@@ -42,7 +42,6 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// IMPLEMENTATION NEEDED
         //set valid bit to zero on evicted page
         (coremap[frame].pte)->frame &= (~PG_VALID);
-        printf("before segfault after set evicted page valid to 0\n");
         //if dirty write victim page to swap
         if ((coremap[frame].pte)-> frame & PG_DIRTY){
             swap_off = swap_pageout(frame,coremap[frame].pte->swap_off);
@@ -52,7 +51,6 @@ int allocate_frame(pgtbl_entry_t *p) {
             }
             coremap[frame].pte->swap_off = (off_t) swap_off;
             evict_dirty_count++;
-            printf("dirtyevict before seg?\n");
         }else{
             //no need to write victim page, update clean count
             evict_clean_count++;
@@ -66,7 +64,6 @@ int allocate_frame(pgtbl_entry_t *p) {
 	// Record information for virtual page that will now be stored in frame
 	coremap[frame].in_use = 1;
 	coremap[frame].pte = p;
-    printf("rightbefore return\n");
 	return frame;
 }
 
@@ -151,7 +148,6 @@ void init_frame(int frame, addr_t vaddr) {
  * this function.
  */
 char *find_physpage(addr_t vaddr, char type) {
-    printf("entered find physspage\n");
     pgtbl_entry_t *p=NULL; // pointer to the full page table entry for vaddr
 	unsigned idx = PGDIR_INDEX(vaddr); // get index into page directory
 
@@ -187,26 +183,21 @@ char *find_physpage(addr_t vaddr, char type) {
 		if(frame_no == -1){
             perror("error allocating_frame");
         }
-        printf("miss count\n");
         //Bin modified here
         p->frame &= PAGE_SHIFT-1;
         p->frame |= frame_no << PAGE_SHIFT;
-        printf("aftershifting\n");
 
 		//ONSWAP is 1, page is on disk
 		if ((p->frame) & PG_ONSWAP) {
 			swap_pagein(frame_no, p->swap_off);
 			//page is in memory now, mark it as VALID
 			p->frame |= PG_VALID;
-			printf("page swapped in\n");
 		}
 		// page is not on disk, first time access the page
 		else {
-            printf("page not on disk\n");
 			init_frame(frame_no, vaddr);
 			//mark it as DIRTY, so it will be written to swap when evicted
 			p->frame |= PG_DIRTY;
-            printf("have initialized\n");
 		}
 	}
 
@@ -220,20 +211,15 @@ char *find_physpage(addr_t vaddr, char type) {
 	}
 
 	//update vadd in physmem
-	printf("before sig fault (right before vadd update)\n");
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
-    printf("mem_ptr success\n");
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
-    printf("prob before seg fault (vaddr_ptr)\n");
     *vaddr_ptr = vaddr;
-    printf("prob before\n");
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
 
 
 
 	// Return pointer into (simulated) physical memory at start of frame
-	printf("findpys finishes\n");
 	return  &physmem[(p->frame >> PAGE_SHIFT)*SIMPAGESIZE];
 }
 
