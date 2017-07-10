@@ -157,7 +157,7 @@ void lru_ref(pgtbl_entry_t *p) {
                     }
 
 
-                }
+
                 else if(num_frames > 4){
                     flag = 1;
                     frames_tail->next = cur_frame->next;
