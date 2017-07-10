@@ -111,14 +111,13 @@ void lru_ref(pgtbl_entry_t *p) {
 		cur_frame = frames_head;
 		for (i = 0; i < num_frames; i++){
             if ((num_frames > 1)&&(cur_frame->next == hold_frame)){
-                if((frames_head == cur_frame) && (num_frames > 2)){
-                    flag = 1;
+                   // flag = 1;
                     //when theres three or more frames and p is next to head
-                    frames_head->next = frames_head->next->next;
-                    frames_tail->next = cur_frame->next;
-                    frames_tail = cur_frame->next;
-                    frames_tail->next = NULL;
-                    break;
+                    //frames_head->next = frames_head->next->next;
+                    //frames_tail->next = cur_frame->next;
+                    //frames_tail = cur_frame->next;
+                    //frames_tail->next = NULL;
+                    //break;
                 //}else if(cur_frame->next->next == frames_tail){
                 //if (num_frames = 2){
                     //when theres 2 frames and p is the first one
@@ -210,6 +209,7 @@ void lru_ref(pgtbl_entry_t *p) {
             }
 			cur_frame = cur_frame->next;
 		}
+	}
 		// hold_frame is not in the list, add hold_frame to the tail
 		if (flag == 0){
 			assert(num_frames < memsize);
@@ -220,7 +220,7 @@ void lru_ref(pgtbl_entry_t *p) {
 
 		}
 
-	}
+
     printf("current queue start\n");
     temp_frame = frames_head;
     for (i = 0; i<num_frames; i++){
