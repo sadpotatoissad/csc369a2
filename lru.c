@@ -186,6 +186,7 @@ void lru_ref(pgtbl_entry_t *p) {
                 frames_tail->next = cur_frame;
                 frames_tail = cur_frame;
                 frames_tail->next = NULL;
+                break;
             }
             else if ((frames_tail == cur_frame) && (hold_frame == cur_frame)){
                 flag = 1;
