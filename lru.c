@@ -114,7 +114,7 @@ void lru_ref(pgtbl_entry_t *p) {
 		//check if frame p is already in queue
 		for (i = 0; i < num_frames; i++){
             //if p is the head of queue
-            if(i = 0 && prev_frame == hold_frame && prev_frame == frames_head){
+            if((i == 0) && (prev_frame == hold_frame) && (prev_frame == frames_head)){
                 if(num_frames == 1){
                     flag = 1;
                     break;
@@ -124,7 +124,7 @@ void lru_ref(pgtbl_entry_t *p) {
                     frames_head = frames_head->next;
                     frames_tail->next = hold_frame;
                     frames_tail = hold_frame;
-                    frame_tail->next = NULL;
+                    frames_tail->next = NULL;
                     flag = 1;
                     break;
                 }
