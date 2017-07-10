@@ -7,7 +7,7 @@
 #include "sim.h"  //for testing
 
 
-extern int memsize;
+extern unsigned memsize;//change back to int after testing
 
 extern int debug;
 
@@ -54,8 +54,8 @@ int lru_evict() {
 void lru_ref(pgtbl_entry_t *p) {
     printf("check");
     struct frame *hold_frame;
-   // struct frame *temp_frame;
-    struct frame *temp_f;
+    struct frame *temp_frame;
+    //struct frame *temp_f;
     struct frame *cur_frame;
     int i, frame_no;
 
@@ -182,7 +182,7 @@ void lru_ref(pgtbl_entry_t *p) {
             else if ((frames_head == cur_frame) && (hold_frame == cur_frame)){
                 //p is head more than two frames
                 flag = 1;
-                frames_head = frame_head->next;
+                frames_head = frames_head->next;
                 frames_tail->next = cur_frame;
                 frames_tail = cur_frame;
                 frames_tail->next = NULL;
