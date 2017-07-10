@@ -145,7 +145,20 @@ void lru_ref(pgtbl_entry_t *p) {
                     }
 
 
-                }else if(num_frames > 4){
+                }
+                else if(frames_head->next == cur_frame->next){
+                    //when there is more than three frames and p is before tail
+                    flag = 1;
+                    frames_head->next = frames_head->next->next;
+                    frames_tail->next = cur_frame;
+                    frames_tail = cur_frame;
+                    frames_tail->next = NULL;
+                    break;
+                    }
+
+
+                }
+                else if(num_frames > 4){
                     flag = 1;
                     frames_tail->next = cur_frame->next;
                     frames_tail = cur_frame->next;
