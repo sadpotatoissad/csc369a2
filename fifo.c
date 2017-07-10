@@ -11,9 +11,9 @@ extern unsigned memsize; // modified type of memsize from int to unsigned by Bin
 extern int debug;
 
 extern struct frame *coremap;
-static struct frame *frames_head;
-static struct frame *frames_tail;
-static int num_frames;
+struct frame *frames_head;
+struct frame *frames_tail;
+int num_frames;
 
 /* Page to evict is chosen using the fifo algorithm.
  * Returns the page frame number (which is also the index in the coremap)

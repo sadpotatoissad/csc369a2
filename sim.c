@@ -53,14 +53,14 @@ void access_mem(char type, addr_t vaddr) {
 
 	if (*checkaddr != vaddr) {
 		fprintf(stderr,"Error, simulated page returned by pagetable lookup doese not have expected value.\n");
-		fprintf(stderr,"memptr=%p, vaddr=%p\n", (void *)(memptr), (void *)vaddr);
 		fprintf(stderr,"*checkaddr=%p, vaddr=%p\n", (void *)(*checkaddr), (void *)vaddr);
 	}
 	
 	if (type == 'S' || type == 'M') {
 		// write access to page, increment version number
 		(*versionptr)++;
-        printf("modify %d \n", *versionptr);
+		if(debug)
+			printf("modify %d \n", *versionptr);
 	}
 
 }
@@ -77,8 +77,6 @@ void replay_trace(FILE *infp) {
 			if(debug)  {
 				printf("%c %lx\n", type, vaddr);
 			}
-			printf("\n"); // for debug
-			printf("%c %lx\n", type, vaddr); // for debug
 			access_mem(type, vaddr);
 		} else {
 			continue;
@@ -125,13 +123,13 @@ int main(int argc, char *argv[]) {
 	// This happens before calling the replacement algorithm init function
 	// so that the init_fcn can refer to the coremap if needed.
 	coremap = calloc(memsize, sizeof(struct frame));
-	//add by Bin
-	// for debug
-	int i;
-	printf("init coremap\n");
-	for (i=0; i<memsize; i++){
-		//coremap[i].in_use = 0;
-		printf("i=%d, coremap[%d].in_use=%d\n", i,i,coremap[i].in_use);
+	
+	if(debug){
+		int i;
+		printf("init coremap\n");
+		for (i=0; i<memsize; i++){
+			printf("i=%d, coremap[%d].in_use=%d\n", i,i,coremap[i].in_use);
+		}
 	}
 	
 	physmem = malloc(memsize * SIMPAGESIZE);

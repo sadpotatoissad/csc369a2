@@ -3,30 +3,27 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <stdlib.h>
-#include "pagetable.h"
-#include "sim.h"  //for testing
+#include "sim.h"  // add this by Bin just for printing vadrr
 
-
-extern unsigned memsize;//change back to int after testing
+extern unsigned memsize; // modified type of memsize from int to unsigned by Bin just for printing vaddr
 
 extern int debug;
 
 extern struct frame *coremap;
-static struct frame *frames_head;
-static struct frame *frames_tail;
-static int num_frames;
-
+struct frame *frames_head;
+struct frame *frames_tail;
+int num_frames;
 /* Page to evict is chosen using the accurate LRU algorithm.
  * Returns the page frame number (which is also the index in the coremap)
  * for the page that is to be evicted.
  */
 
 int lru_evict() {
-    int ret;
+	int ret;
     struct frame *frame_hold;
     if(num_frames == 0){
         perror("incorrect evict no frames in memory");
-        return -1;
+        ret = -1;
     }
     //remove tail from frame list (the first frame in)
     if((memsize == 1)&&(num_frames == 1)){
@@ -44,6 +41,7 @@ int lru_evict() {
     frame_hold->next = NULL;
     ret = ((frame_hold->pte->frame) >> PAGE_SHIFT);
 	return ret;
+	return 0;
 }
 
 /* This function is called on each access to a page to update any information
@@ -57,18 +55,14 @@ void lru_ref(pgtbl_entry_t *p) {
     struct frame *prev_frame;
     int i, frame_no, flag;
     flag = 0;
-
+    
     //shift to correct position
     frame_no = (p->frame) >> PAGE_SHIFT;
     hold_frame = &(coremap[frame_no]);
 
     if (num_frames == 0){
-        //first frame to be added
 		frames_head = hold_frame;
 		frames_tail = hold_frame;
-        hold_frame->next = NULL;
-		frames_head->next = NULL;
-		frames_tail->next = NULL;
 		num_frames++;
 	}
 	else {
@@ -115,12 +109,11 @@ void lru_ref(pgtbl_entry_t *p) {
 
 		// hold_frame is not in the queue, add hold_frame to the tail
 		if (flag == 0){
-			assert(num_frames < memsize);
 			frames_tail->next = hold_frame;
 			frames_tail = hold_frame;
 			hold_frame->next = NULL;
 			num_frames++;
-
+			
 		}
 	}
     if(debug){
@@ -142,10 +135,11 @@ void lru_ref(pgtbl_entry_t *p) {
 }
 
 
-/* Initialize any data structures needed for this
- * replacement algorithm
+/* Initialize any data structures needed for this 
+ * replacement algorithm 
  */
 void lru_init() {
+	//initialize queue of frames
     num_frames = 0;
     frames_head = NULL;
     frames_tail = NULL;

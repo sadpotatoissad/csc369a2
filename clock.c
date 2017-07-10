@@ -23,7 +23,7 @@ int clock_evict() {
 	int least_recent_idx = -1;//coremap[0].current_time;
 	for (i = 0; i < memsize; i++){		
 		if (coremap[i].ref == 1){
-			printf("set ref to 0 for frame %d\n", i);
+			//printf("set ref to 0 for frame %d\n", i);
 			coremap[i].ref = 0;
 		}else {
 			if (i==0){
@@ -35,7 +35,7 @@ int clock_evict() {
 
 		}
 		if (i == memsize - 1 && least_recent_idx == -1){
-			printf("all frames were 1, so we check least recent for another round\n");
+			//printf("all frames were 1, so we check least recent for another round\n");
 			for (j = 0; j < memsize; j++){
 				if (j==0){
 					least_recent_idx = j;
@@ -47,7 +47,7 @@ int clock_evict() {
 		}
 	}
 
-	printf("clock evict frame %d\n", least_recent_idx);
+	//printf("clock evict frame %d\n", least_recent_idx);
 	//int idx = (int)(random() % memsize);//this is from rand
 	return least_recent_idx;
 }
@@ -57,7 +57,7 @@ int clock_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void clock_ref(pgtbl_entry_t *p) {
-	printf("clock ref\n");
+	//printf("clock ref\n");
 	coremap[p->frame >> PAGE_SHIFT].current_time = clock();
 	return;
 }
@@ -66,7 +66,7 @@ void clock_ref(pgtbl_entry_t *p) {
  * algorithm. 
  */
 void clock_init() {
-	printf("clock init\n");
+	//printf("clock init\n");
 	order = malloc(memsize * sizeof(int));
 	int i;
 	for (i = 0; i < memsize; i++){
