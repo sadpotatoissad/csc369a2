@@ -57,6 +57,7 @@ void lru_ref(pgtbl_entry_t *p) {
     struct frame *temp_frame;
     //struct frame *temp_f;
     struct frame *cur_frame;
+    struct frame *prev_frame;
     int i, frame_no;
 
     //shift to correct position
@@ -106,111 +107,48 @@ void lru_ref(pgtbl_entry_t *p) {
 		num_frames++;
 	}
 	else {
-		//check if hold_frame is in the list, if in, no change
+		//check if hold_frame is in the list
 		int flag = 0;
-		cur_frame = frames_head;
+		cur_frame = frames_head->next;
+		prev_frame = frames_head;
+		//check if frame p is already in queue
 		for (i = 0; i < num_frames; i++){
-            if ((num_frames > 1)&&(cur_frame->next == hold_frame)){
-                   // flag = 1;
-                    //when theres three or more frames and p is next to head
-                    //frames_head->next = frames_head->next->next;
-                    //frames_tail->next = cur_frame->next;
-                    //frames_tail = cur_frame->next;
-                    //frames_tail->next = NULL;
-                    //break;
-                //}else if(cur_frame->next->next == frames_tail){
-                //if (num_frames = 2){
-                    //when theres 2 frames and p is the first one
-                   // frames_head = frames_head->next;
-                   // frames_tail->next = cur_frame;
-                   // frames_tail = cur_frame;
-                    //frames_tail->next = NULL;
-                    //when there is three frames and p is before tail
-                    if(num_frames == 3){
-                        flag = 1;
-                        frames_head->next = frames_head->next->next;
-                        frames_tail->next = cur_frame->next;
-                        frames_tail = cur_frame->next;
-                        frames_tail->next = NULL;
-                        break;
-                    }else if(cur_frame->next->next == frames_tail){
-                        //when there is more than three frames and p is before tail
-                        printf("when there is more than three frames and p is before tail\n");
-                        flag = 1;
-                        frames_tail->next = cur_frame->next;
-                        frames_tail = cur_frame->next;
-                        cur_frame->next = cur_frame->next->next;
-                        break;
-
-                    //}
-
-
-                }
-                else if(frames_head->next == cur_frame->next){
-                    //when there is more than three frames and p is after head
-                    printf("when there is more than three frames and p is after head\n");
+            //if p is the head of queue
+            if(i = 0 && prev_frame == hold_frame && prev_frame == frames_head){
+                if(num_frames == 1){
                     flag = 1;
-                    frames_head->next = frames_head->next->next;
-                    frames_tail->next = cur_frame;
-                    frames_tail = cur_frame;
-                    frames_tail->next = NULL;
                     break;
-                    }
-
-
-
-                else if(num_frames > 4){
-                    flag = 1;
-                    frames_tail->next = cur_frame->next;
-                    frames_tail = cur_frame->next;
-                    cur_frame->next = cur_frame->next->next;
-                    frames_tail->next = NULL;
-                    break;
-
-
                 }
-
+                //p is head, move p to tail
+                else{
+                    frames_head = frames_head->next;
+                    frames_tail->next = hold_frame;
+                    frames_tail = hold_frame;
+                    frame_tail->next = NULL;
+                    flag = 1;
+                    break;
+                }
             }
-            else if((num_frames == 2) && (hold_frame == cur_frame)){
-                //has 2 frames
-                if(cur_frame == frames_head){
-                    //p is head
-                    flag = 1;
-                    frames_head = frames_tail;
-                    frames_tail->next = cur_frame;
-                    frames_tail = cur_frame;
+            //move frame to tail
+            else if (cur_frame == hold_frame){
+                if (cur_frame != frames_tail){
+                    prev_frame->next = cur_frame->next;
+                    frames_tail->next = hold_frame;
+                    frames_tail = hold_frame;
                     frames_tail->next = NULL;
+                    flag = 1;
                     break;
                 }
                 else{
-                    //already at tail
-                    flag = 1;
-                    break;
+                flag = 1;
+                break;
                 }
             }
-            else if ((num_frames == 1)&& (hold_frame == cur_frame)){
-                //p is only frame in queue
-                flag = 1;
-                break;
+            prev_frame = cur_frame;
+            cur_frame = cur_frame->next;
             }
-            else if ((frames_head == cur_frame) && (hold_frame == cur_frame)){
-                //p is head more than two frames
-                flag = 1;
-                frames_head = frames_head->next;
-                frames_tail->next = cur_frame;
-                frames_tail = cur_frame;
-                frames_tail->next = NULL;
-                break;
-            }
-            else if ((frames_tail == cur_frame) && (hold_frame == cur_frame)){
-                flag = 1;
-                //p is tail
-                break;
-            }
-			cur_frame = cur_frame->next;
-		}
-	}
-		// hold_frame is not in the list, add hold_frame to the tail
+        }
+		// hold_frame is not in the queue, add hold_frame to the tail
 		if (flag == 0){
 			assert(num_frames < memsize);
 			frames_tail->next = hold_frame;
