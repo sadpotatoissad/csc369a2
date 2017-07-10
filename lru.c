@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
+#include "sim.h"  //for testing
 
 
 extern int memsize;
@@ -53,7 +54,7 @@ int lru_evict() {
 void lru_ref(pgtbl_entry_t *p) {
     printf("check");
     struct frame *hold_frame;
-    struct frame *temp_frame;
+   // struct frame *temp_frame;
     struct frame *temp_f;
     struct frame *cur_frame;
     int i, frame_no;
@@ -144,7 +145,7 @@ void lru_ref(pgtbl_entry_t *p) {
                     }
 
 
-                }else if((num_frames > 4){
+                }else if(num_frames > 4){
                     flag = 1;
                     frames_tail->next = cur_frame->next;
                     frames_tail = cur_frame->next;
@@ -181,10 +182,10 @@ void lru_ref(pgtbl_entry_t *p) {
             else if ((frames_head == cur_frame) && (hold_frame == cur_frame)){
                 //p is head more than two frames
                 flag = 1;
-                frame_head = frame_head->next;
+                frames_head = frame_head->next;
                 frames_tail->next = cur_frame;
                 frames_tail = cur_frame;
-                frame_tail->next = null;
+                frames_tail->next = NULL;
             }
             else if ((frames_tail == cur_frame) && (hold_frame == cur_frame)){
                 flag = 1;
