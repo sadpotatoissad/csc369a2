@@ -148,7 +148,7 @@ void lru_ref(pgtbl_entry_t *p) {
             prev_frame = cur_frame;
             cur_frame = cur_frame->next;
             }
-        }
+
 		// hold_frame is not in the queue, add hold_frame to the tail
 		if (flag == 0){
 			assert(num_frames < memsize);
@@ -158,6 +158,7 @@ void lru_ref(pgtbl_entry_t *p) {
 			num_frames++;
 
 		}
+	}
 
 
     printf("current queue start\n");
