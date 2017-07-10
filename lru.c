@@ -119,7 +119,7 @@ void lru_ref(pgtbl_entry_t *p) {
                     frames_tail = cur_frame->next;
                     frames_tail->next = NULL;
                     break;
-                }else if(cur_frame->next->next == frames_tail){
+                //}else if(cur_frame->next->next == frames_tail){
                 //if (num_frames = 2){
                     //when theres 2 frames and p is the first one
                    // frames_head = frames_head->next;
@@ -136,13 +136,14 @@ void lru_ref(pgtbl_entry_t *p) {
                         break;
                     }else{
                         //when there is more than three frames and p is before tail
+                        printf("when there is more than three frames and p is before tail\n");
                         flag = 1;
                         frames_tail->next = cur_frame->next;
                         frames_tail = cur_frame->next;
                         cur_frame->next = cur_frame->next->next;
                         break;
 
-                    }
+                    //}
 
 
                 }
