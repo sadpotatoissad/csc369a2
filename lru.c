@@ -52,10 +52,8 @@ int lru_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void lru_ref(pgtbl_entry_t *p) {
-    printf("check");
     struct frame *hold_frame;
-    struct frame *temp_frame;
-    //struct frame *temp_f;
+    struct frame *temp_frame; //just used for debug
     struct frame *cur_frame;
     struct frame *prev_frame;
     int i, frame_no, flag;
@@ -64,39 +62,6 @@ void lru_ref(pgtbl_entry_t *p) {
     //shift to correct position
     frame_no = (p->frame) >> PAGE_SHIFT;
     hold_frame = &(coremap[frame_no]);
-    /*
-    if(frames_head == NULL){
-        //queue is empty
-        printf("queue is empty\n");
-        frames_head = cur_frame;
-        frames_tail = cur_frame;
-        frames_head->next = NULL;
-        num_frames = 1;
-        printf("queue now has: %i\n", num_frames);
-    }
-    else if (!(num_frames < memsize)){
-        //out of memory case
-        perror("out of mem");
-        return;
-    }
-    else{
-        //check if already in queue; if in queue, return
-        hold_frame = frames_tail;
-        for (i = 0; i<num_frames; i++){
-            if(hold_frame == cur_frame){
-                printf("already in queue, matching hold_frame %i with cur_frame %i\n", ((hold_frame->pte->frame)>>12),((cur_frame->pte->frame)>>12) );
-                return;
-            }
-            hold_frame = hold_frame->next;
-
-        }
-        hold_frame = frames_head;
-        hold_frame->next = cur_frame;
-        frames_head = cur_frame;
-        num_frames++;
-    }
-    * */
-
 
     if (num_frames == 0){
         //first frame to be added
@@ -159,21 +124,21 @@ void lru_ref(pgtbl_entry_t *p) {
 
 		}
 	}
-
-
-    printf("current queue start\n");
-    temp_frame = frames_head;
-    for (i = 0; i<num_frames; i++){
-		// in order to print vaddr
-		int temp_frame_no = (temp_frame->pte->frame)>>12;
-		// Calculate pointer to start of frame in (simulated) physical memory
-		char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
-		// Calculate pointer to location in page where we keep the vaddr
-		addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
-        printf("%0lx\n",*vaddr_ptr);
-        temp_frame = temp_frame->next;
-       }
-    printf("current queue end\n");
+    if(debug){
+        printf("current queue start\n");
+        temp_frame = frames_head;
+        for (i = 0; i<num_frames; i++){
+		    // in order to print vaddr
+		    int temp_frame_no = (temp_frame->pte->frame)>>12;
+		    // Calculate pointer to start of frame in (simulated) physical memory
+		    char *mem_ptr = &physmem[temp_frame_no*SIMPAGESIZE];
+		    // Calculate pointer to location in page where we keep the vaddr
+		    addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+            printf("%0lx\n",*vaddr_ptr);
+            temp_frame = temp_frame->next;
+           }
+        printf("current queue end\n");
+    }
 	return;
 }
 
