@@ -61,6 +61,7 @@ int fifo_evict() {
     frames_head = frames_head->next;
     //frames_tail->next = frame_hold;
     //frames_tail = frame_hold;
+    num_frames--;
     frame_hold->next = NULL;
     ret = ((frame_hold->pte->frame) >> PAGE_SHIFT);
     printf("evicted %i (evict function)\n", ret);
