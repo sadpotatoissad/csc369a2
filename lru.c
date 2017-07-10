@@ -59,6 +59,7 @@ void lru_ref(pgtbl_entry_t *p) {
     struct frame *cur_frame;
     struct frame *prev_frame;
     int i, frame_no, flag;
+    flag = 0;
 
     //shift to correct position
     frame_no = (p->frame) >> PAGE_SHIFT;
@@ -108,7 +109,7 @@ void lru_ref(pgtbl_entry_t *p) {
 	}
 	else {
 		//check if hold_frame is in the list
-		flag = 0;
+
 		cur_frame = frames_head->next;
 		prev_frame = frames_head;
 		//check if frame p is already in queue
