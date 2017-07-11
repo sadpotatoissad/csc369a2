@@ -15,6 +15,7 @@
 #define PG_DIRTY        (0x2) // Dirty bit in pgd or pte, set if modified
 #define PG_REF          (0x4) // Reference bit, set if page has been referenced
 #define PG_ONSWAP       (0x8) // Set if page has been evicted to swap
+#define CLOCK_REF       (0x10) // Set if it is a hit, for clock algo
 #define INVALID_SWAP    -1
 
 #ifdef TRACE_64
@@ -66,9 +67,7 @@ struct frame {
 	char in_use;       // True if frame is allocated, False if frame is free
 	pgtbl_entry_t *pte;// Pointer back to pagetable entry (pte) for page
 	                   // stored in this frame
-    struct frame* next; //points to the next frame
-    char ref;
-    clock_t current_time;
+    struct frame* next; //points to the next frame, used for lru, fifo and opt
 };
 
 /* The coremap holds information about physical memory.

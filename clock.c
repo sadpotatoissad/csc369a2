@@ -5,51 +5,54 @@
 #include <stdlib.h>
 #include "pagetable.h"
 #include "time.h"
+#include "sim.h"  // add this by Bin just for printing vadrr
 
-extern int memsize;
+extern unsigned memsize; // modified type of memsize from int to unsigned by Bin just for printing vaddr
 
 extern int debug;
 
 extern struct frame *coremap;
-int *order;
+
+int clock_hand = 0;
 /* Page to evict is chosen using the clock algorithm.
  * Returns the page frame number (which is also the index in the coremap)
  * for the page that is to be evicted.
  */
 
 int clock_evict() {
-	int i;
-	int j;
-	int least_recent_idx = -1;//coremap[0].current_time;
-	for (i = 0; i < memsize; i++){		
-		if (coremap[i].ref == 1){
-			//printf("set ref to 0 for frame %d\n", i);
-			coremap[i].ref = 0;
+	int i,j;
+	int frame_no = -1;
+	for (i = clock_hand; i < memsize; i++){		
+		if ((coremap[i].pte->frame) & CLOCK_REF){
+			printf("set ref to 0 for frame %d\n", i);
+			coremap[i].pte->frame &= ~CLOCK_REF;
 		}else {
-			if (i==0){
-				least_recent_idx = i;
-			}
-			else if (coremap[i].current_time < coremap[least_recent_idx].current_time){
-				least_recent_idx = i;
-			}
-
+			frame_no = i;
+			break;
 		}
-		if (i == memsize - 1 && least_recent_idx == -1){
-			//printf("all frames were 1, so we check least recent for another round\n");
+		if (i == memsize - 1 && frame_no == -1){
+			printf("all frames were 1, so we check least recent for another round\n");
 			for (j = 0; j < memsize; j++){
-				if (j==0){
-					least_recent_idx = j;
-				}
-				else if (coremap[j].current_time < coremap[least_recent_idx].current_time){
-					least_recent_idx = j;
+				if ((coremap[j].pte->frame) & CLOCK_REF){
+					printf("set ref to 0 for frame %d\n", i);
+					coremap[j].pte->frame &= ~CLOCK_REF;
+				}else {
+					frame_no = j;
+					break;
 				}
 			}
 		}
 	}
-
-	//printf("clock evict frame %d\n", least_recent_idx);
-	//int idx = (int)(random() % memsize);//this is from rand
-	return least_recent_idx;
+	
+	if (frame_no == memsize -1){
+		clock_hand = 0;
+	}
+	else{
+		clock_hand = frame_no + 1;
+	}
+	printf("frame_no=%d\n", frame_no);
+	printf("clock_hand=%d\n", clock_hand);
+	return frame_no;
 }
 
 /* This function is called on each access to a page to update any information
@@ -57,8 +60,17 @@ int clock_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void clock_ref(pgtbl_entry_t *p) {
-	//printf("clock ref\n");
-	coremap[p->frame >> PAGE_SHIFT].current_time = clock();
+
+	//for debug
+	int i;
+	printf("\n");
+	for (i=0; i<memsize; i++){
+		// Calculate pointer to start of frame in (simulated) physical memory
+		char *mem_ptr = &physmem[i*SIMPAGESIZE];
+		// Calculate pointer to location in page where we keep the vaddr
+		addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
+        printf("%0lx\n",*vaddr_ptr);
+	}
 	return;
 }
 
@@ -66,10 +78,5 @@ void clock_ref(pgtbl_entry_t *p) {
  * algorithm. 
  */
 void clock_init() {
-	//printf("clock init\n");
-	order = malloc(memsize * sizeof(int));
-	int i;
-	for (i = 0; i < memsize; i++){
-		coremap[i].ref = 0;
-	}
+	return;
 }

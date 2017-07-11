@@ -175,8 +175,8 @@ char *find_physpage(addr_t vaddr, char type) {
     // if VALID is 1, page is in memory. it's a hit
     if ((p->frame) & PG_VALID) { 
 		hit_count ++;
-        frame_no = p->frame >> PAGE_SHIFT;
-        coremap[frame_no].ref = 1; 		
+        frame_no = p->frame >> PAGE_SHIFT; 	
+        p->frame |= CLOCK_REF; // set CLOCK_REF bit to 1 for clock algo	
 	}
 	// else, page is not in memory. it's a miss
 	else {
@@ -187,7 +187,6 @@ char *find_physpage(addr_t vaddr, char type) {
             perror("error allocating_frame");
         }
         
-        //Bin modified here
         p->frame &= PAGE_SHIFT-1;
         p->frame |= frame_no << PAGE_SHIFT;
         
@@ -213,13 +212,14 @@ char *find_physpage(addr_t vaddr, char type) {
 	if (type == 'S' || type == 'M'){
 		(p->frame) |= PG_DIRTY;
 	}
-	
+
 	//update vadd in physmem
     char *mem_ptr = &physmem[frame_no*SIMPAGESIZE];
     addr_t *vaddr_ptr = (addr_t *)(mem_ptr + sizeof(int));
     *vaddr_ptr = vaddr;
     
 	// Call replacement algorithm's ref_fcn for this page
+
 	ref_fcn(p);
 	
 
