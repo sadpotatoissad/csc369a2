@@ -14,6 +14,12 @@ extern struct frame *coremap;
 
 extern char *tracefile;
 
+/* In order to save running time, I read trace file only once in opt_init() and keep all info I need 
+ * to choose opt evict frame. I used a hash map to record the info of vaddr_index and its seq_no of occurance
+ * the key is vaddr_index, which is vaddr >> PAGE_SHIFT, and the value is a linked list seq_no. when hashCode(key)
+ * are the same for different vaddr_index, use chaining. 
+ */ 
+
 #define HASHSIZE 4096
 int num_frames;
 struct frame *frames_head;
@@ -30,8 +36,8 @@ struct Sequence {
 
 // each unique vaddr_index has a struct DataItem to record all its occurance of sequence number in the trace file
 struct DataItem {
-   struct Sequence *data;   
-   struct Sequence *checkpoint;
+   struct Sequence *data;   // head of linked sequence
+   struct Sequence *checkpoint; // the seq_no before checkpoint has been checked, they won't be check again
    unsigned long key; //vaddr_index
    struct DataItem *next;
 };
@@ -48,7 +54,7 @@ struct DataItem *search(unsigned long key) {
    //get the hash 
    int hashIndex = hashCode(key);  
 	struct DataItem *cur = NULL;
-   //
+   //if key is in hash map, return its position
 	if (hashArray[hashIndex] != NULL) {
 		cur = hashArray[hashIndex];
 		if (cur->key == key){
@@ -82,7 +88,6 @@ void insert(unsigned long key,int seq_no) {
 	
    //get the hash 
    int hashIndex = hashCode(key);
-	//
 	if (hashArray[hashIndex] == NULL){
 		hashArray[hashIndex] = item;
 	}
