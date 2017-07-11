@@ -219,7 +219,6 @@ char *find_physpage(addr_t vaddr, char type) {
     *vaddr_ptr = vaddr;
     
 	// Call replacement algorithm's ref_fcn for this page
-
 	ref_fcn(p);
 	
 

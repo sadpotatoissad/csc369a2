@@ -4,9 +4,9 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
-#include "sim.h" //add by Bin for read through trace file
+#include "sim.h" // add this just for debug printing vaddr
 
-extern unsigned memsize; //modified by Bin from int ot unsigned
+extern unsigned memsize; //modified type of memsize from int to unsigned for debug printing vaddr
 
 extern int debug;
 

@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include "pagetable.h"
 #include "time.h"
-#include "sim.h"  // add this by Bin just for printing vadrr
+#include "sim.h"  // add this just for debug printing vaddr
 
-extern unsigned memsize; // modified type of memsize from int to unsigned by Bin just for printing vaddr
+extern unsigned memsize; // modified type of memsize from int to unsigned for debug printing vaddr
 
 extern int debug;
 
@@ -31,7 +31,7 @@ int clock_evict() {
 			break;
 		}
 		if (i == memsize - 1 && frame_no == -1){
-			//printf("all frames were 1, so we check least recent for another round\n");
+			//printf("all frames were 1 since clock hand, so we check for another round\n");
 			for (j = 0; j < memsize; j++){
 				if ((coremap[j].pte->frame) & CLOCK_REF){
 					//printf("set ref to 0 for frame %d\n", i);
@@ -50,8 +50,11 @@ int clock_evict() {
 	else{
 		clock_hand = frame_no + 1;
 	}
-	//printf("frame_no=%d\n", frame_no);
-	//printf("clock_hand=%d\n", clock_hand);
+	if(debug){
+		
+		printf("evict frame_no=%d\n", frame_no);
+		printf("after eviction, clock_hand=%d\n", clock_hand);
+	}
 	return frame_no;
 }
 
